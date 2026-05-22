@@ -1,29 +1,64 @@
 #!/bin/bash
-# eggd_app
+# eggd_pyTMB, version 1.0.0
 
-# Exit at any point if there is any error and output each line as it is executed (for debugging)
-# -e = exit on error; -x = output each line that is executed to log; -o pipefail = throw an error if there's an error in pipeline
-set -e -x -o pipefail
+# The following line causes bash to exit at any point if there is any error
+# and to output each line as it is executed -- useful for debugging
+set -exo pipefail
 
-main() {
-    # Install packages if required
+dx-download-all-inputs
 
-    ## Download input files (individual or an array)
-    # either all at once, in which case they are placed into separate folders
-    dx-download-all-inputs --parallel
-    # Each input is placed under its own subfolder "~/in/name_of_input_field/", named after the input field.
-    # can be accessed by using $input_file_path variable or
-    # $input_file_name equivalent to basename command,
-    # $input_file_prefix filename without the extension
-    #  also for array of files input, individual files are downloaded into subfolders
-    # /in/input_file_array/0/file0 and /in/input_file_array/1/file1 and so on
-    # in which case they have to be moved manually into the same folder, if needed
-    mkdir input_files
-    find ~/in/input_file_array -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input_files
+mkdir -p /home/dnanexus/out/tmb_report
 
-    # or files can be downloaded one by one, specifying a name for them within the workstation
-    dx download "$input_file" -o input_file_name
+# Add bundled binaries (mosdepth) to PATH
+export PATH="/home/dnanexus/bin:${PATH}"
 
-    
+# Install dependencies from bundled wheels then install pytmb package
+sudo -H python3 -m pip install --no-index --no-deps /home/dnanexus/packages/*
+sudo -H python3 -m pip install --no-deps /home/dnanexus
 
-}
+# Derive sample name from VCF filename
+SAMPLE="${vcf_prefix}"
+
+# Place BAM index alongside BAM so mosdepth can find it
+mv "${bam_bai_path}" "$(dirname ${bam_path})/"
+BAI_PATH="$(dirname ${bam_path})/$(basename ${bam_bai_path})"
+if [[ ! -f "${BAI_PATH}" ]]; then
+    echo "Error: BAM index not found at ${BAI_PATH}" >&2
+    exit 1
+fi
+
+# Run pyEffGenomeSize and extract effective genome size
+EFF_GENOME_SIZE=$(pyEffGenomeSize \
+  --bed "${bed_path}" \
+  --gtf "${gtf_path}" \
+  --filterNonCoding \
+  --bam "${bam_path}" \
+  --minCoverage 100 \
+  --minMapq 50 \
+  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1 | grep "Effective Genome Size" | awk '{print $(NF-1)}')
+
+if [[ -z "${EFF_GENOME_SIZE}" ]]; then
+    echo "Error: pyEffGenomeSize did not return an effective genome size. Check logs above." >&2
+    exit 1
+fi
+
+echo "effGenomeSize for ${SAMPLE}: ${EFF_GENOME_SIZE}"
+
+# Run pyTMB and capture report
+pyTMB \
+  -i "${vcf_path}" \
+  --varConfig "/home/dnanexus/pytmb/config/tnhaplotyper.yml" \
+  --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
+  --effGenomeSize "${EFF_GENOME_SIZE}" \
+  --vaf 0.05 --maf 0.0001 \
+  --minDepth 50 --minAltDepth 2 \
+  --filterLowQual --filterNonCoding --filterSyn --filterSplice \
+  --filterPolym --polymDb 1k,gnomad \
+  > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2>&1
+
+if [[ ! -s "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" ]]; then
+    echo "Error: TMB report is empty or was not created for ${SAMPLE}" >&2
+    exit 1
+fi
+
+dx-upload-all-outputs
