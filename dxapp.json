@@ -95,12 +95,6 @@
         "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
         "folder": "/app_assets/htslib/htslib_v1.15.0",
         "version": "1.15.0"
-      },
-      {
-        "name": "python_packages",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/python_packages/python_packages_v1.1.0",
-        "version": "1.1.0"
       }
     ]
   },
