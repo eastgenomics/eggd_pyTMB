@@ -36,7 +36,7 @@
       "optional": false,
       "label": "Annotated VCF file",
       "patterns": [
-        "*.vcf", "*.vcf.gz"
+        "*.vcf", "*.vcf.gz", "*.bcf", "*.bcf.gz"
       ],
       "help": "VEP-annotated VCF file (.vcf, .vcf.gz, .bcf, .bcf.gz)"
     },

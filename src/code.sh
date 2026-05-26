@@ -18,9 +18,9 @@ sudo -H python3 -m pip install --no-index --no-deps /home/dnanexus/packages/*
 # Derive sample name from VCF filename
 SAMPLE="${vcf_prefix}"
 
-# Place BAM index alongside BAM so mosdepth can find it
-mv "${bam_bai_path}" "$(dirname ${bam_path})/"
-BAI_PATH="$(dirname ${bam_path})/$(basename ${bam_bai_path})"
+# Place BAM index at the exact path mosdepth/htslib derives from the BAM path
+BAI_PATH="${bam_path}.bai"
+mv "${bam_bai_path}" "${BAI_PATH}"
 if [[ ! -f "${BAI_PATH}" ]]; then
     echo "Error: BAM index not found at ${BAI_PATH}" >&2
     exit 1
@@ -34,7 +34,7 @@ EFF_OUTPUT=$(pyEffGenomeSize \
   --bam "${bam_path}" \
   --minCoverage 100 \
   --minMapq 50 \
-  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1)
+  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1) || true
 echo "${EFF_OUTPUT}"
 EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}')
 

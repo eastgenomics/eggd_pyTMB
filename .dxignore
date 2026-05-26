@@ -1,0 +1,4 @@
+resources/home/dnanexus/build/
+resources/home/dnanexus/pytmb.egg-info/
+resources/home/dnanexus/__pycache__/
+resources/home/dnanexus/**/*.pyc
