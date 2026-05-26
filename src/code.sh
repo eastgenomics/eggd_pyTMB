@@ -12,9 +12,8 @@ mkdir -p /home/dnanexus/out/tmb_report
 # Add bundled binaries (mosdepth) to PATH
 export PATH="/home/dnanexus/bin:${PATH}"
 
-# Install dependencies from bundled wheels then install pytmb package
+# Install all wheels (dependencies + pytmb package)
 sudo -H python3 -m pip install --no-index --no-deps /home/dnanexus/packages/*
-sudo -H python3 -m pip install --no-deps /home/dnanexus
 
 # Derive sample name from VCF filename
 SAMPLE="${vcf_prefix}"
@@ -28,14 +27,16 @@ if [[ ! -f "${BAI_PATH}" ]]; then
 fi
 
 # Run pyEffGenomeSize and extract effective genome size
-EFF_GENOME_SIZE=$(pyEffGenomeSize \
+EFF_OUTPUT=$(pyEffGenomeSize \
   --bed "${bed_path}" \
   --gtf "${gtf_path}" \
   --filterNonCoding \
   --bam "${bam_path}" \
   --minCoverage 100 \
   --minMapq 50 \
-  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1 | grep "Effective Genome Size" | awk '{print $(NF-1)}')
+  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1)
+echo "${EFF_OUTPUT}"
+EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}')
 
 if [[ -z "${EFF_GENOME_SIZE}" ]]; then
     echo "Error: pyEffGenomeSize did not return an effective genome size. Check logs above." >&2
