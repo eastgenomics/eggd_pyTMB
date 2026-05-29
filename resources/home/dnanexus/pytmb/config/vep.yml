@@ -37,9 +37,7 @@ polymDb:
     - 27  # gnomADg_AF
   1k: []
 
-cancerDb:
-  cosmic:
-    - COSMICcMuts
+cancerDb: {}
 
 recurrence:
   run: []

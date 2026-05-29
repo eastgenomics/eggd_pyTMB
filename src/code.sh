@@ -5,18 +5,12 @@
 # and to output each line as it is executed -- useful for debugging
 set -exo pipefail
 
-dx-download-all-inputs
+dx-download-all-inputs --parallel
 
 mkdir -p /home/dnanexus/out/tmb_report
 
-# Add bundled binaries (mosdepth) to PATH
-export PATH="/home/dnanexus/bin:${PATH}"
-
-# Install all wheels (dependencies + pytmb package)
-sudo -H python3 -m pip install --no-index --no-deps /home/dnanexus/packages/*
-
-# Derive sample name from VCF filename
-SAMPLE="${vcf_prefix}"
+# Derive sample name by stripping pipeline suffix from VCF filename
+SAMPLE="${vcf_prefix/_markdup_recalibrated_tnhaplotyper2_annotated/}"
 
 # Place BAM index at the exact path mosdepth/htslib derives from the BAM path
 BAI_PATH="${bam_path}.bai"
@@ -27,7 +21,7 @@ if [[ ! -f "${BAI_PATH}" ]]; then
 fi
 
 # Run pyEffGenomeSize and extract effective genome size
-EFF_OUTPUT=$(pyEffGenomeSize \
+EFF_OUTPUT=$(python3 -m pytmb.cli.run_effgenomesize \
   --bed "${bed_path}" \
   --gtf "${gtf_path}" \
   --filterNonCoding \
@@ -51,13 +45,13 @@ fi
 echo "effGenomeSize for ${SAMPLE}: ${EFF_GENOME_SIZE}"
 
 # Run pyTMB and capture report
-pyTMB \
+python3 -m pytmb.cli.run_tmb \
   -i "${vcf_path}" \
   --varConfig "/home/dnanexus/pytmb/config/tnhaplotyper.yml" \
   --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
   --effGenomeSize "${EFF_GENOME_SIZE}" \
-  --vaf 0.05 --maf 0.0001 \
-  --minDepth 50 --minAltDepth 2 \
+  --vaf "${vaf}" --maf "${maf}" \
+  --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
   --filterLowQual --filterNonCoding --filterSyn --filterSplice \
   --filterPolym --polymDb 1k,gnomad \
   > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2>&1

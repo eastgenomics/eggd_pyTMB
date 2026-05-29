@@ -59,6 +59,38 @@
         "*.bam.bai", "*.bai"
       ],
       "help": "BAM index file (.bai) required by mosdepth for coverage computation."
+    },
+    {
+      "name": "vaf",
+      "class": "float",
+      "optional": true,
+      "default": 0.05,
+      "label": "Minimum variant allele frequency",
+      "help": "Variants with VAF below this threshold are excluded. Default: 0.05."
+    },
+    {
+      "name": "maf",
+      "class": "float",
+      "optional": true,
+      "default": 0.0001,
+      "label": "Maximum population allele frequency",
+      "help": "Variants with population MAF above this threshold are excluded as germline. Default: 0.0001."
+    },
+    {
+      "name": "min_depth",
+      "class": "int",
+      "optional": true,
+      "default": 50,
+      "label": "Minimum total read depth",
+      "help": "Variants with total depth below this threshold are excluded. Default: 50."
+    },
+    {
+      "name": "min_alt_depth",
+      "class": "int",
+      "optional": true,
+      "default": 2,
+      "label": "Minimum alt allele depth",
+      "help": "Variants with fewer than this many alt reads are excluded. Default: 2."
     }
   ],
   "outputSpec": [
@@ -95,6 +127,18 @@
         "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
         "folder": "/app_assets/htslib/htslib_v1.15.0",
         "version": "1.15.0"
+      },
+      {
+        "name": "mosdepth",
+        "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
+        "folder": "/app_assets/mosdepth_v0.3.3",
+        "version": "0.3.3"
+      },
+      {
+        "name": "pytmb",
+        "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
+        "folder": "/app_assets/pytmb_v1.6.0",
+        "version": "1.6.0"
       }
     ]
   },
