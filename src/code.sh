@@ -43,6 +43,11 @@ if [[ -z "${EFF_GENOME_SIZE}" ]]; then
     exit 1
 fi
 
+if [[ "${EFF_GENOME_SIZE}" -eq 0 ]]; then
+    echo "Error: Effective genome size is 0 bp" >&2
+    exit 1
+fi
+
 echo "effGenomeSize for ${SAMPLE}: ${EFF_GENOME_SIZE}"
 
 # Run pyTMB and capture report
