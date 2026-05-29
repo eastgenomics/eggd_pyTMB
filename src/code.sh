@@ -21,14 +21,18 @@ if [[ ! -f "${BAI_PATH}" ]]; then
 fi
 
 # Run pyEffGenomeSize and extract effective genome size
-EFF_OUTPUT=$(python3 -m pytmb.cli.run_effgenomesize \
+if ! EFF_OUTPUT=$(python3 -m pytmb.cli.run_effgenomesize \
   --bed "${bed_path}" \
   --gtf "${gtf_path}" \
   --filterNonCoding \
   --bam "${bam_path}" \
   --minCoverage 100 \
   --minMapq 50 \
-  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1) || true
+  --oprefix "/home/dnanexus/out/${SAMPLE}" 2>&1); then
+    echo "${EFF_OUTPUT}"
+    echo "Error: pyEffGenomeSize failed — see output above" >&2
+    exit 1
+fi
 echo "${EFF_OUTPUT}"
 EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}')
 
