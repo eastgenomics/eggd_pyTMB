@@ -1,7 +1,7 @@
 {
-  "name": "eggd_<tool_name>",
-  "title": "eggd_<tool_name>",
-  "summary": "description",
+  "name": "eggd_pyTMB",
+  "title": "eggd_pyTMB",
+  "summary": "Calculates Tumour Mutational Burden (TMB) from an annotated VCF using pyTMB",
   "dxapi": "1.0.0",
   "version": "1.0.0",
   "properties": {
@@ -9,63 +9,100 @@
     },
   "inputSpec": [
     {
-      "name": "input_file",
+      "name": "bed",
       "class": "file",
       "optional": true,
-      "label": "Name of input file",
+      "default": {"$dnanexus_link": "file-GjBQ30Q4qv8xv4PB054qYFfX"},
+      "label": "Capture BED file",
       "patterns": [
-        "*.tsv", "*.vcf", "*.bed", "*.xlsx"
+        "*.bed"
       ],
-      "help": "Description"
+      "help": "Capture design BED file. Defaults to coding_unrestricted_GRCh38_myeloid_v1.2.bed."
     },
     {
-      "name": "input_file_array",
-      "class": "array:file",
+      "name": "gtf",
+      "class": "file",
+      "optional": true,
+      "default": {"$dnanexus_link": "file-J8812VQ46QQPK08P00VZZPgy"},
+      "label": "GTF annotation file",
+      "patterns": [
+        "*.gtf", "*.gtf.gz"
+      ],
+      "help": "Genome annotation GTF file. Defaults to GENCODE v47 no-chr (GRCh38)."
+    },
+    {
+      "name": "vcf",
+      "class": "file",
       "optional": false,
-      "label": "Name of input file array",
-      "suggestions": [
-        {
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "path": "/folder1/folder2/"
-        }
+      "label": "Annotated VCF file",
+      "patterns": [
+        "*.vcf", "*.vcf.gz", "*.bcf", "*.bcf.gz"
       ],
-      "help": "Description"
+      "help": "VEP-annotated VCF file (.vcf, .vcf.gz, .bcf, .bcf.gz)"
     },
     {
-      "name": "input_boolean",
-      "class": "boolean",
-      "optional": true,
-      "default": true,
-      "label": "Name of field",
-      "help": "Description"
+      "name": "bam",
+      "class": "file",
+      "optional": false,
+      "label": "BAM file",
+      "patterns": [
+        "*.bam"
+      ],
+      "help": "BAM file used to compute sample-specific coverage-based effective genome size."
     },
     {
-      "name": "input_string",
-      "class": "string",
-      "label": "Input string field name",
+      "name": "bam_bai",
+      "class": "file",
+      "optional": false,
+      "label": "BAM index file",
+      "patterns": [
+        "*.bam.bai", "*.bai"
+      ],
+      "help": "BAM index file (.bai) required by mosdepth for coverage computation."
+    },
+    {
+      "name": "vaf",
+      "class": "float",
       "optional": true,
-      "default": "default string input",
-      "help": "Description"
+      "default": 0.05,
+      "label": "Minimum variant allele frequency",
+      "help": "Variants with VAF below this threshold are excluded. Default: 0.05."
+    },
+    {
+      "name": "maf",
+      "class": "float",
+      "optional": true,
+      "default": 0.0001,
+      "label": "Maximum population allele frequency",
+      "help": "Variants with population MAF above this threshold are excluded as germline. Default: 0.0001."
+    },
+    {
+      "name": "min_depth",
+      "class": "int",
+      "optional": true,
+      "default": 50,
+      "label": "Minimum total read depth",
+      "help": "Variants with total depth below this threshold are excluded. Default: 50."
+    },
+    {
+      "name": "min_alt_depth",
+      "class": "int",
+      "optional": true,
+      "default": 2,
+      "label": "Minimum alt allele depth",
+      "help": "Variants with fewer than this many alt reads are excluded. Default: 2."
     }
   ],
   "outputSpec": [
     {
-      "name": "output_file",
+      "name": "tmb_report",
       "class": "file",
-      "label": "output file",
+      "label": "TMB report",
       "patterns": [
-        "*.tsv", "*.vcf", "*.bed", "*.xlsx"
+        "*.txt"
       ],
-      "help": "Description"
-    },
-    {
-      "name": "output_files_array",
-      "class": "array:file",
-      "label": "output files",
-      "optional": true,
-      "help": "Description"
+      "help": "Plain-text TMB report produced by pyTMB, including TMB score, 95% CI, and filter statistics."
     }
-
   ],
   "runSpec": {
     "timeoutPolicy": {
@@ -92,10 +129,16 @@
         "version": "1.15.0"
       },
       {
-        "name": "python_packages",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/python_packages/python_packages_v1.1.0",
-        "version": "1.1.0"
+        "name": "mosdepth",
+        "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
+        "folder": "/app_assets/mosdepth_v0.3.3",
+        "version": "0.3.3"
+      },
+      {
+        "name": "pytmb",
+        "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
+        "folder": "/app_assets/pytmb_v1.6.0",
+        "version": "1.6.0"
       }
     ]
   },
