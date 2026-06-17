@@ -29,9 +29,9 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 
 **Other inputs (optional)**:
 
-`bed` (`file`): Capture design BED file. Defaults to `coding_unrestricted_GRCh38_myeloid_v1.2.bed`.
+`bed` (`file`): Capture design BED file.
 
-`gtf` (`file`): Genome annotation GTF file (`.gtf` / `.gtf.gz`). Defaults to GENCODE v47 no-chr (GRCh38).
+`gtf` (`file`): Genome annotation GTF file (`.gtf` / `.gtf.gz`).
 
 `vaf` (`float`): Minimum variant allele frequency. Variants with VAF below this threshold are excluded. Default: `0.05`.
 
