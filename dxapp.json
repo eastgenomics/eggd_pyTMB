@@ -12,23 +12,21 @@
       "name": "bed",
       "class": "file",
       "optional": true,
-      "default": {"$dnanexus_link": "file-GjBQ30Q4qv8xv4PB054qYFfX"},
       "label": "Capture BED file",
       "patterns": [
         "*.bed"
       ],
-      "help": "Capture design BED file. Defaults to coding_unrestricted_GRCh38_myeloid_v1.2.bed."
+      "help": "Capture design BED file."
     },
     {
       "name": "gtf",
       "class": "file",
       "optional": true,
-      "default": {"$dnanexus_link": "file-J8812VQ46QQPK08P00VZZPgy"},
       "label": "GTF annotation file",
       "patterns": [
         "*.gtf", "*.gtf.gz"
       ],
-      "help": "Genome annotation GTF file. Defaults to GENCODE v47 no-chr (GRCh38)."
+      "help": "Genome annotation GTF file."
     },
     {
       "name": "vcf",
