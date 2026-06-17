@@ -6,11 +6,9 @@ Calculates Tumour Mutational Burden (TMB) from an annotated VCF using [pyTMB](ht
 The app uses mosdepth to compute a sample-specific, coverage-based effective genome size from the input BAM and capture BED, then runs pyTMB against the annotated VCF (restricted to the capture BED region) using the supplied VAF, population allele frequency, depth and alt-depth filters to produce a TMB score, its 95% confidence interval, and filtering statistics.
 
 ## What are the typical use cases for this app?
-
 This app may be executed as a standalone app to calculate TMB for a tumour sample as part of a somatic variant calling workflow, where a VEP-annotated VCF and the corresponding BAM are already available.
 
 ## What are the inputs?
-
 **Packages (DNAnexus assets)**
 
 - `bedtools` (v2.30.0)
@@ -43,7 +41,6 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 This app outputs a single plain-text TMB report (`*.txt`) produced by `pyTMB`, containing the TMB score, its 95% confidence interval, and filtering statistics.
 
 ## How to run this app from command line?
-
 **Example**:
 ```
 dx run eggd_pyTMB \
