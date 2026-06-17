@@ -1,4 +1,3 @@
-<!-- dx-header -->
 # eggd_pyTMB (DNAnexus Platform App)
 This could be used as a starting point when developing new apps for DNAnexus
 
