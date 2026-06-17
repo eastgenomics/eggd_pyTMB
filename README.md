@@ -1,7 +1,5 @@
 # eggd_pyTMB (DNAnexus Platform App)
-This could be used as a starting point when developing new apps for DNAnexus
 
-<!-- Insert a description of your app here -->
 ## What does this app do?
 Calculates Tumour Mutational Burden (TMB) from an annotated VCF using [pyTMB](https://github.com/bioinfo-pf-curie/TMB).
 
