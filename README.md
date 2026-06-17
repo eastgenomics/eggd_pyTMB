@@ -21,12 +21,10 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 - `vcf`: VEP-annotated VCF file (`.vcf`, `.vcf.gz`, `.bcf`, `.bcf.gz`).
 - `bam`: BAM file used to compute the sample-specific, coverage-based effective genome size.
 - `bam_bai`: BAM index file (`.bam.bai` / `.bai`) required by `mosdepth` for coverage computation.
+- `bed` (`file`): Capture design BED file.
+- `gtf` (`file`): Genome annotation GTF file (`.gtf` / `.gtf.gz`).
 
 **Other inputs (optional)**:
-
-`bed` (`file`): Capture design BED file.
-
-`gtf` (`file`): Genome annotation GTF file (`.gtf` / `.gtf.gz`).
 
 `vaf` (`float`): Minimum variant allele frequency. Variants with VAF below this threshold are excluded. Default: `0.05`.
 
