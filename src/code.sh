@@ -10,7 +10,7 @@ dx-download-all-inputs --parallel
 mkdir -p /home/dnanexus/out/tmb_report
 
 # Derive sample name by stripping pipeline suffix from VCF filename
-SAMPLE="${vcf_prefix/_markdup_recalibrated_tnhaplotyper2_annotated/}"
+SAMPLE="${vcf_prefix%%_*}" 
 
 # Place BAM index at the exact path mosdepth/htslib derives from the BAM path
 BAI_PATH="${bam_path}.bai"
@@ -65,4 +65,4 @@ if [[ ! -s "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" ]]; then
     exit 1
 fi
 
-dx-upload-all-outputs
+dx-upload-all-outputs --parallel 
