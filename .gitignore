@@ -1,0 +1,21 @@
+# Test data (large input files in repo root)
+*.bam
+*.bam.bai
+*.vcf.gz
+*.bed
+*.gtf.gz
+
+# Build artefacts
+resources/home/dnanexus/build/
+resources/home/dnanexus/pytmb.egg-info/
+
+# Test files
+test/output/
+test/test_run.sh
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/

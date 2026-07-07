@@ -1,0 +1,43 @@
+# VEP CSQ field indices (0-based):
+# 0:Allele 1:SYMBOL 2:Consequence 3:IMPACT 4:EXON 5:INTRON
+# 24:gnomADe_AF 27:gnomADg_AF 28:COSMICcMuts
+
+tag: CSQ
+sep: "&"
+
+isCoding:
+  3:
+    - HIGH
+    - MODERATE
+
+isNonCoding:
+  3:
+    - MODIFIER
+
+isSynonymous:
+  2:
+    - synonymous_variant
+    - stop_retained_variant
+    - start_retained_variant
+
+isNonSynonymous:
+  3:
+    - HIGH
+    - MODERATE
+
+isSplicing:
+  2:
+    - splice_acceptor_variant
+    - splice_donor_variant
+    - splice_region_variant
+
+polymDb:
+  gnomad:
+    - 24  # gnomADe_AF
+    - 27  # gnomADg_AF
+  1k: []
+
+cancerDb: {}
+
+recurrence:
+  run: []
