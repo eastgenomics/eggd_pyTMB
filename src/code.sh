@@ -14,7 +14,13 @@ SAMPLE="${vcf_prefix%%_*}"
 
 # Place BAM index at the exact path mosdepth/htslib derives from the BAM path
 BAI_PATH="${bam_path}.bai"
-mv "${bam_bai_path}" "${BAI_PATH}"
+if [[ ! -f "${bam_bai_path}" ]]; then
+    echo "Error: BAM index input not found at ${bam_bai_path}" >&2
+    exit 1
+fi
+if [[ "${bam_bai_path}" != "${BAI_PATH}" ]]; then
+    cp -f "${bam_bai_path}" "${BAI_PATH}"
+fi
 if [[ ! -f "${BAI_PATH}" ]]; then
     echo "Error: BAM index not found at ${BAI_PATH}" >&2
     exit 1
