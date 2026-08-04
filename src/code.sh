@@ -150,9 +150,13 @@ main() {
     echo "${EFF_OUTPUT}"
     EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}')
 
-    # Check if effective genome size is valid (non-zero and non-empty), else create a TMB report with NA values to indicate failure
-    if [[ "${EFF_GENOME_SIZE}" -eq 0 ||  -z "${EFF_GENOME_SIZE}" ]]; then
-        echo "Error: Effective genome size is 0 bp OR did not return an effective genome size." >&2
+    # Extract effective genome size; fall back to a sentinel if the pipeline
+    # finds no match, so set -e/pipefail doesn't kill the script here
+    EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}') || EFF_GENOME_SIZE="NO_EFF_GENOME_SIZE"
+
+    # Single check: catches the no-match sentinel, any non-numeric value, AND zero
+    if [[ ! "${EFF_GENOME_SIZE}" =~ ^[1-9][0-9]*$ ]]; then
+        echo "Error: Effective genome size ('${EFF_GENOME_SIZE}') is not a valid positive integer." >&2
         _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"
     else
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
