@@ -172,14 +172,16 @@ main() {
             --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
             --filterLowQual --filterNonCoding --filterSyn --filterSplice \
             --filterPolym --polymDb 1k,gnomad \
-            > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2> "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.stderr.log"; then
+            > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2> "/home/dnanexus/${SAMPLE}_TMB.stderr.log"; then
             echo "pyTMB completed successfully"
         else
             echo "Error: run_tmb failed (exit code $?) — see stderr log" >&2
-            cat "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.stderr.log" >&2
+            cat "/home/dnanexus/${SAMPLE}_TMB.stderr.log" >&2
             _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"  
         fi
     fi
+
+    /home/dnanexus/out/tmb_report
 
     dx-upload-all-outputs
 
