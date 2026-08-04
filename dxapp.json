@@ -155,10 +155,10 @@
         "version": "1.6.0"
       },
       {
-          "name": "samtools_asset",
-          "version": "2.0.0",
-          "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-          "folder": "/app_assets/samtools/samtools_v1.19.2/"
+        "name": "samtools_asset",
+        "version": "2.0.0",
+        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
+        "folder": "/app_assets/samtools/samtools_v1.19.2/"
       }
     ]
   },
