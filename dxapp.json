@@ -11,7 +11,7 @@
     {
       "name": "bed",
       "class": "file",
-      "optional": true,
+      "optional": false,
       "label": "Capture BED file",
       "patterns": [
         "*.bed"
