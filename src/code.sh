@@ -181,8 +181,6 @@ main() {
         fi
     fi
 
-    /home/dnanexus/out/tmb_report
-
     dx-upload-all-outputs
 
 }
