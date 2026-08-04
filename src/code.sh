@@ -8,33 +8,37 @@ set -exo pipefail
 
 # Writes a TMB report populated with NA values, used as a fallback when
 # effective genome size or pyTMB itself fails to produce a valid result.
-# Usage: _create_na_tmb_report <output_file> <input_vcf> [sample_name]
+# Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> [sample_name]
 _create_na_tmb_report() {
     local output_file="$1"
     local input_vcf="$2"
-    local sample_name="${3:-None}"
-
-    if [[ -z "$output_file" || -z "$input_vcf" ]]; then
-        echo "Usage: _create_na_tmb_report <output_file> <input_vcf> [sample_name]" >&2
+    local vaf_val="$3"
+    local maf_val="$4"
+    local min_depth_val="$5"
+    local min_alt_depth_val="$6"
+    local sample_name="${7:-None}"
+ 
+    if [[ -z "$output_file" || -z "$input_vcf" || -z "$vaf_val" || -z "$maf_val" || -z "$min_depth_val" || -z "$min_alt_depth_val" ]]; then
+        echo "Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> [sample_name]" >&2
         return 1
     fi
-
+ 
     cat > "$output_file" <<EOF
 pyTMB version= 1.6.0
 When= $(date +%Y-%m-%d)
-
+ 
 Input= ${input_vcf}
 Sample= ${sample_name}
-
+ 
 Config caller= /home/dnanexus/pytmb/config/vcf.yml
 Config databases= /home/dnanexus/pytmb/config/vep.yml
-
+ 
 Filters:
 -------
-VAF= 0.05
-MAF= 0.0001
-minDepth= 50
-minAltDepth= 2
+VAF= ${vaf_val}
+MAF= ${maf_val}
+minDepth= ${min_depth_val}
+minAltDepth= ${min_alt_depth_val}
 filterLowQual= True
 filterIndels= False
 filterCoding= False
@@ -149,7 +153,7 @@ main() {
     # Check if effective genome size is valid (non-zero and non-empty), else create a TMB report with NA values to indicate failure
     if [[ "${EFF_GENOME_SIZE}" -eq 0 ||  -z "${EFF_GENOME_SIZE}" ]]; then
         echo "Error: Effective genome size is 0 bp OR did not return an effective genome size." >&2
-        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${SAMPLE}"
+        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"
     else
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
         # Run pyTMB and capture report
@@ -169,7 +173,7 @@ main() {
     if [[ ! -s "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" ]]; then
         echo "Error: TMB report is empty or was not created for ${SAMPLE}" >&2
         # create a TMB report with NA values to indicate failure
-        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${SAMPLE}"
+        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"
     fi
 
     dx-upload-all-outputs
