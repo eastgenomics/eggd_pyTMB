@@ -124,6 +124,8 @@ main() {
     fi
 
     # Derive sample name by stripping pipeline suffix from VCF filename
+    # The VCF filename is stripped after the first underscore, which is assumed to be the sample name.
+    # e.g if the VCF prefix is "AA-BB-CC_tnhaplotyper2", then SAMPLE="AA-BB-CC".
     SAMPLE="${vcf_prefix%%_*}"
 
     # Place BAM index at the exact path mosdepth/htslib derives from the BAM path
