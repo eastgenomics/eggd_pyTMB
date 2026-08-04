@@ -156,24 +156,23 @@ main() {
         _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"
     else
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
-        # Run pyTMB and capture report
-        python3 -m pytmb.cli.run_tmb \
-        -i "${vcf_path}" \
-        --varConfig "/home/dnanexus/pytmb/config/vcf.yml" \
-        --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
-        --effGenomeSize "${EFF_GENOME_SIZE}" \
-        --vaf "${vaf}" --maf "${maf}" \
-        --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
-        --filterLowQual --filterNonCoding --filterSyn --filterSplice \
-        --filterPolym --polymDb 1k,gnomad \
-        > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2>&1
-    fi
-
-    # check that the TMB report was created and is not empty
-    if [[ ! -s "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" ]]; then
-        echo "Error: TMB report is empty or was not created for ${SAMPLE}" >&2
-        # create a TMB report with NA values to indicate failure
-        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"
+        # run pyTMB, capture output to the report file, and capture exit status separately
+        if python3 -m pytmb.cli.run_tmb \
+            -i "${vcf_path}" \
+            --varConfig "/home/dnanexus/pytmb/config/vcf.yml" \
+            --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
+            --effGenomeSize "${EFF_GENOME_SIZE}" \
+            --vaf "${vaf}" --maf "${maf}" \
+            --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
+            --filterLowQual --filterNonCoding --filterSyn --filterSplice \
+            --filterPolym --polymDb 1k,gnomad \
+            > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2> "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.stderr.log"; then
+            echo "pyTMB completed successfully"
+        else
+            echo "Error: run_tmb failed (exit code $?) — see stderr log" >&2
+            cat "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.stderr.log" >&2
+            _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"  
+        fi
     fi
 
     dx-upload-all-outputs
