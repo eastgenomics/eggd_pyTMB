@@ -8,17 +8,17 @@
     {
       "name": "bed",
       "class": "file",
-      "optional": true,
+      "optional": false,
       "label": "Capture BED file",
       "patterns": [
         "*.bed"
       ],
-      "help": "Capture design BED file."
+      "help": "Capture design BED file. Should be 0-based, sorted, and with no header."
     },
     {
       "name": "gtf",
       "class": "file",
-      "optional": true,
+      "optional": false,
       "label": "GTF annotation file",
       "patterns": [
         "*.gtf", "*.gtf.gz"
@@ -86,6 +86,22 @@
       "default": 2,
       "label": "Minimum alt allele depth",
       "help": "Variants with fewer than this many alt reads are excluded. Default: 2."
+    },
+    {
+      "name": "min_coverage",
+      "class": "int",
+      "optional": true,
+      "default": 50,
+      "label": "Minimum coverage",
+      "help": "Minimum coverage per region of the BED file. Default: 50."
+    },
+    {
+      "name": "min_mapquality",
+      "class": "int",
+      "optional": true,
+      "default": 50,
+      "label": "Minimum mapping quality",
+      "help": "Minimum mapping quality threshold. Reads below this value are ignored. Default: 50."
     }
   ],
   "outputSpec": [
@@ -134,6 +150,12 @@
         "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
         "folder": "/app_assets/pytmb_v1.6.0",
         "version": "1.6.0"
+      },
+      {
+        "name": "samtools_asset",
+        "version": "2.0.0",
+        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
+        "folder": "/app_assets/samtools/samtools_v1.19.2/"
       }
     ]
   },
