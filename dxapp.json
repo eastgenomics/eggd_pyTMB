@@ -105,6 +105,14 @@
       "default": 50,
       "label": "Minimum mapping quality",
       "help": "Minimum mapping quality threshold. Reads below this value are ignored. Default: 50."
+    },
+    {
+      "name": "vcf_yaml",
+      "class": "string",
+      "optional": false,
+      "default": "rnhaplotyper2",
+      "label": "VCF YAML configuration. Options are: tso500 or tnhaplotyper2",
+      "help": "YAML file containing VCF annotation parameters. Options are: tso500 or tnhaplotyper2"
     }
   ],
   "outputSpec": [
