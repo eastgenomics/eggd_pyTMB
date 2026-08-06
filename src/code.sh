@@ -162,11 +162,12 @@ main() {
     EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}') || EFF_GENOME_SIZE="NO_EFF_GENOME_SIZE"
 
     TMB_REPORT="/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt"
+    assay_vcf_yaml="/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml"  # default to tnhaplotyper2 if not provided
 
     # Single check: catches the no-match sentinel, any non-numeric value, AND zero
     if [[ ! "${EFF_GENOME_SIZE}" =~ ^[1-9][0-9]*$ ]]; then
         echo "Error: Effective genome size ('${EFF_GENOME_SIZE}') is not a valid positive integer." >&2
-        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${EFF_GENOME_SIZE}" "/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml" "${SAMPLE}"
+        _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${EFF_GENOME_SIZE}" "${assay_vcf_yaml}" "${SAMPLE}"
     else
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
         # run pyTMB, capture output to the report file, and capture exit status separately
@@ -198,7 +199,7 @@ main() {
         echo "pyTMB completed successfully"
     else
         echo "pyTMB completed with no report data; creating an NA report" >&2
-        _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}"  "${EFF_GENOME_SIZE}" "/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml""${SAMPLE}"
+        _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}"  "${EFF_GENOME_SIZE}" "${assay_vcf_yaml}" "${SAMPLE}"
     fi
     
 
