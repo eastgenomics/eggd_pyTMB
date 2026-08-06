@@ -19,8 +19,9 @@ _create_na_tmb_report() {
     local maf_val="$4"
     local min_depth_val="$5"
     local min_alt_depth_val="$6"
-    local sample_name="${7:-None}"
-    local egs="$8"
+    local egs="$7"
+    local sample_name="${8:-None}"
+
  
     if [[ -z "$output_file" || -z "$input_vcf" || -z "$vaf_val" || -z "$maf_val" || -z "$min_depth_val" || -z "$min_alt_depth_val" || -z "$egs" ]]; then
         echo "Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> <effective_genome_size> [sample_name]" >&2
@@ -172,7 +173,7 @@ main() {
         set +e   # temporarily turn off "exit on error"
         python3 -m pytmb.cli.run_tmb \
             -i "${vcf_path}" \
-            --varConfig "/home/dnanexus/pytmb/config/vcf.yml" \
+            --varConfig "/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml" \
             --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
             --effGenomeSize "${EFF_GENOME_SIZE}" \
             --vaf "${vaf}" --maf "${maf}" \
