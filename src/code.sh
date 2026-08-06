@@ -155,7 +155,6 @@ main() {
         exit 1
     fi
     echo "${EFF_OUTPUT}"
-    EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}')
 
     # Extract effective genome size; fall back to a sentinel if the pipeline
     # finds no match, so set -e/pipefail doesn't kill the script here
