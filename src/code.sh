@@ -196,7 +196,7 @@ main() {
     if [[ -s "${TMB_REPORT}" ]]; then
         echo "pyTMB completed successfully"
     else
-        echo "Error: run_tmb failed (exit code ${exit_code}) — report file empty" >&2
+        echo "pyTMB completed with no report data; creating an NA report" >&2
         _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}"  "${EFF_GENOME_SIZE}" "${SAMPLE}"
     fi
     
