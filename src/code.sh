@@ -171,8 +171,7 @@ main() {
     else
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
         # run pyTMB, capture output to the report file, and capture exit status separately
-        set +e   # temporarily turn off "exit on error"
-        python3 -m pytmb.cli.run_tmb \
+        if ! python3 -m pytmb.cli.run_tmb \
             -i "${vcf_path}" \
             --varConfig "/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml" \
             --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
@@ -181,26 +180,23 @@ main() {
             --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
             --filterLowQual --filterNonCoding --filterSyn --filterSplice \
             --filterPolym --polymDb 1k,gnomad \
-            > "${TMB_REPORT}" 
-            
-        exit_code=$?
-        set -e  # turn it back on for the rest of the script
+            > "${TMB_REPORT}" ; then
+            exit_code=$?
+            echo "FATAL: run_tmb failed with exit code ${exit_code}" >&2
+            echo "--- ${TMB_REPORT} contents ---" >&2
+            cat "${TMB_REPORT}" >&2
+            exit 1
+        fi
+            # Otherwise fall back to the NA report for genuine "no data" outcomes
+        if [[ -s "${TMB_REPORT}" ]]; then
+            echo "pyTMB completed successfully"
+        else
+            echo "pyTMB completed with no report data; creating an NA report" >&2
+            _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}"  "${EFF_GENOME_SIZE}" "${assay_vcf_yaml}" "${SAMPLE}"
+        fi
     fi
 
-    if [[ ${exit_code} -ne 0 ]]; then
-        echo "FATAL: run_tmb failed with exit code ${exit_code}" >&2
-        echo "--- ${TMB_REPORT} contents ---" >&2
-        cat "${TMB_REPORT}" >&2
-        exit 1
-    fi
 
-    # Otherwise fall back to the NA report for genuine "no data" outcomes
-    if [[ -s "${TMB_REPORT}" ]]; then
-        echo "pyTMB completed successfully"
-    else
-        echo "pyTMB completed with no report data; creating an NA report" >&2
-        _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}"  "${EFF_GENOME_SIZE}" "${assay_vcf_yaml}" "${SAMPLE}"
-    fi
     
 
     dx-upload-all-outputs
