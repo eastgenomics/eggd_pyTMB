@@ -160,7 +160,6 @@ main() {
     EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}') || EFF_GENOME_SIZE="NO_EFF_GENOME_SIZE"
 
     TMB_REPORT="/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt"
-    STDERR_LOG="/home/dnanexus/${SAMPLE}_TMB.stderr.log"
 
     # Single check: catches the no-match sentinel, any non-numeric value, AND zero
     if [[ ! "${EFF_GENOME_SIZE}" =~ ^[1-9][0-9]*$ ]]; then
