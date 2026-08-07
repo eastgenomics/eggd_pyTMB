@@ -3,7 +3,7 @@
   "title": "eggd_pyTMB",
   "summary": "Calculates Tumour Mutational Burden (TMB) from an annotated VCF using pyTMB",
   "dxapi": "1.0.0",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "inputSpec": [
     {
       "name": "bed",
@@ -102,6 +102,14 @@
       "default": 50,
       "label": "Minimum mapping quality",
       "help": "Minimum mapping quality threshold. Reads below this value are ignored. Default: 50."
+    },
+    {
+      "name": "vcf_yaml",
+      "class": "string",
+      "optional": false,
+      "default": "tnhaplotyper2",
+      "label": "VCF YAML configuration. Options are: tso500 or tnhaplotyper2",
+      "help": "YAML file containing VCF annotation parameters. Options are: tso500 or tnhaplotyper2"
     }
   ],
   "outputSpec": [

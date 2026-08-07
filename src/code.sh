@@ -1,6 +1,9 @@
 #!/bin/bash
-# eggd_pyTMB, version 1.0.0
+# eggd_pyTMB
 
+# prefixes all lines of commands written to stdout with datetime
+PS4='\000[$(date)]\011'
+export TZ=Europe/London
 # The following line causes bash to exit at any point if there is any error
 # and to output each line as it is executed -- useful for debugging
 set -exo pipefail
@@ -8,7 +11,7 @@ set -exo pipefail
 
 # Writes a TMB report populated with NA values, used as a fallback when
 # effective genome size or pyTMB itself fails to produce a valid result.
-# Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> [sample_name]
+# Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> <effective_genome_size> <vcf_yaml> [sample_name]
 _create_na_tmb_report() {
     local output_file="$1"
     local input_vcf="$2"
@@ -16,10 +19,13 @@ _create_na_tmb_report() {
     local maf_val="$4"
     local min_depth_val="$5"
     local min_alt_depth_val="$6"
-    local sample_name="${7:-None}"
+    local egs="$7"
+    local vcf_yaml="${8:-None}"
+    local sample_name="${9:-None}"
+
  
-    if [[ -z "$output_file" || -z "$input_vcf" || -z "$vaf_val" || -z "$maf_val" || -z "$min_depth_val" || -z "$min_alt_depth_val" ]]; then
-        echo "Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> [sample_name]" >&2
+    if [[ -z "$output_file" || -z "$input_vcf" || -z "$vaf_val" || -z "$maf_val" || -z "$min_depth_val" || -z "$min_alt_depth_val" || -z "$egs" ]]; then
+        echo "Usage: _create_na_tmb_report <output_file> <input_vcf> <vaf> <maf> <min_depth> <min_alt_depth> <effective_genome_size> <vcf_yaml> [sample_name]" >&2
         return 1
     fi
  
@@ -30,7 +36,7 @@ When= $(date +%Y-%m-%d)
 Input= ${input_vcf}
 Sample= ${sample_name}
  
-Config caller= /home/dnanexus/pytmb/config/vcf.yml
+Config caller= ${vcf_yaml}
 Config databases= /home/dnanexus/pytmb/config/vep.yml
  
 Filters:
@@ -61,7 +67,7 @@ Filter statistics:
 Total number of variants= NA
 Non-informative variants= NA
 Variants after filters= NA
-Effective Genome Size= NA
+Effective Genome Size= ${egs}
 
 TMB= NA
 TMB_95CI_low= NA
@@ -150,36 +156,48 @@ main() {
         exit 1
     fi
     echo "${EFF_OUTPUT}"
-    EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}')
 
     # Extract effective genome size; fall back to a sentinel if the pipeline
     # finds no match, so set -e/pipefail doesn't kill the script here
     EFF_GENOME_SIZE=$(echo "${EFF_OUTPUT}" | grep "Effective Genome Size" | awk '{print $(NF-1)}') || EFF_GENOME_SIZE="NO_EFF_GENOME_SIZE"
 
+    TMB_REPORT="/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt"
+    assay_vcf_yaml="/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml"  # default to tnhaplotyper2 if not provided
+
     # Single check: catches the no-match sentinel, any non-numeric value, AND zero
     if [[ ! "${EFF_GENOME_SIZE}" =~ ^[1-9][0-9]*$ ]]; then
         echo "Error: Effective genome size ('${EFF_GENOME_SIZE}') is not a valid positive integer." >&2
-        _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"
+        _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${EFF_GENOME_SIZE}" "${assay_vcf_yaml}" "${SAMPLE}"
     else
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
         # run pyTMB, capture output to the report file, and capture exit status separately
-        if python3 -m pytmb.cli.run_tmb \
+        if ! python3 -m pytmb.cli.run_tmb \
             -i "${vcf_path}" \
-            --varConfig "/home/dnanexus/pytmb/config/vcf.yml" \
+            --varConfig "/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml" \
             --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
             --effGenomeSize "${EFF_GENOME_SIZE}" \
             --vaf "${vaf}" --maf "${maf}" \
             --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
             --filterLowQual --filterNonCoding --filterSyn --filterSplice \
             --filterPolym --polymDb 1k,gnomad \
-            > "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" 2> "/home/dnanexus/${SAMPLE}_TMB.stderr.log"; then
+            > "${TMB_REPORT}" ; then
+            exit_code=$?
+            echo "FATAL: run_tmb failed with exit code ${exit_code}" >&2
+            echo "--- ${TMB_REPORT} contents ---" >&2
+            cat "${TMB_REPORT}" >&2
+            exit 1
+        fi
+            # Otherwise fall back to the NA report for genuine "no data" outcomes
+        if [[ -s "${TMB_REPORT}" ]]; then
             echo "pyTMB completed successfully"
         else
-            echo "Error: run_tmb failed (exit code $?) — see stderr log" >&2
-            cat "/home/dnanexus/${SAMPLE}_TMB.stderr.log" >&2
-            _create_na_tmb_report "/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}" "${SAMPLE}"  
+            echo "pyTMB completed with no report data; creating an NA report" >&2
+            _create_na_tmb_report "${TMB_REPORT}" "${vcf_path}" "${vaf}" "${maf}" "${min_depth}" "${min_alt_depth}"  "${EFF_GENOME_SIZE}" "${assay_vcf_yaml}" "${SAMPLE}"
         fi
     fi
+
+
+    
 
     dx-upload-all-outputs
 
