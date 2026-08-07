@@ -3,10 +3,7 @@
   "title": "eggd_pyTMB",
   "summary": "Calculates Tumour Mutational Burden (TMB) from an annotated VCF using pyTMB",
   "dxapi": "1.0.0",
-  "version": "1.0.0",
-  "properties": {
-    "githubRelease": "1.0.0"
-    },
+  "version": "1.0.1",
   "inputSpec": [
     {
       "name": "bed",
