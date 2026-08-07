@@ -5,7 +5,7 @@ Calculates Tumour Mutational Burden (TMB) from an annotated VCF using [pyTMB](ht
 
 The app first checks that the BED, BAM, and GTF inputs use a consistent chromosome naming convention (all `chr`-prefixed or all without prefix), failing early if they disagree. It then uses mosdepth to compute a sample-specific, coverage-based effective genome size from the input BAM and capture BED (subject to the `min_coverage` and `min_mapquality` thresholds), and runs pyTMB against the annotated VCF using the supplied VAF, population allele frequency, depth and alt-depth filters — with the variant-config YAML selected via `vcf_yaml` — to produce a TMB score, its 95% confidence interval, and filtering statistics.
 
-If the effective genome size cannot be computed (or pyTMB produces no report data), the app writes a fallback TMB report populated with `NA` values instead of failing the job.
+If either the effective-genome-size computation or pyTMB itself exits with a non-zero status, the job fails. Given that both commands complete successfully, the app instead writes a fallback TMB report populated with `NA` values if the computed effective genome size is not a valid positive integer, or if pyTMB produces an empty report.
 
 ## What are the typical use cases for this app?
 This app may be executed as a standalone app to calculate TMB for a tumour sample as part of a somatic variant calling workflow, where a VEP-annotated VCF and the corresponding BAM are already available.
@@ -46,7 +46,7 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 
 This app outputs a single plain-text TMB report (`<SAMPLE>_TMB.txt`) produced by `pyTMB`, containing the TMB score, its 95% confidence interval, and filtering statistics. `<SAMPLE>` is derived from the input VCF filename (the portion before the first underscore).
 
-If the effective genome size could not be determined, or pyTMB produced no report data, the report is instead populated with `NA` values for the score, confidence interval, and filtering statistics.
+If pyEffGenomeSize or pyTMB exits with a non-zero status, the job fails rather than producing a report. Given that both commands complete successfully, the report is instead populated with `NA` values for the score, confidence interval, and filtering statistics if the computed effective genome size is invalid, or if pyTMB's output is empty.
 
 ## How to run this app from command line?
 **Example**:
