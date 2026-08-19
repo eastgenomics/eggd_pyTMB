@@ -33,8 +33,8 @@ isSplicing:
 
 polymDb:
   gnomad:
-    - 24  # gnomADe_AF
-    - 27  # gnomADg_AF
+    - 20  # gnomADe_AF
+    - 23  # gnomADg_AF
   1k: []
 
 cancerDb: {}
