@@ -14,7 +14,7 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 **Packages (DNAnexus assets)**
 
 - `bedtools` (v2.30.0)
-- `htslib` (v1.15.0)
+- `htslib` (v1.22)
 - `mosdepth` (v0.3.3)
 - `pyTMB` (v1.6.0)
 
