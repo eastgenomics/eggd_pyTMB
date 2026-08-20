@@ -121,8 +121,6 @@ main() {
 
     dx-download-all-inputs --parallel
 
-    mosdepth --version
-    python3 -m pytmb.cli.run_tmb --version
 
     mkdir -p /home/dnanexus/out/tmb_report
     # Check chromosome naming consistency between BED, BAM, and GTF files.
