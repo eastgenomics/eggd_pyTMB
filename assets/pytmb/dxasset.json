@@ -1,9 +1,0 @@
-{
-  "name": "pytmb",
-  "title": "pytmb",
-  "description": "pytmb v1.6.0 and all dependencies (cyvcf2, numpy, scipy, pybedtools, pysam, pandas, pyyaml)",
-  "version": "1.6.0",
-  "distribution": "Ubuntu",
-  "release": "20.04",
-  "instanceType": "mem1_ssd1_v2_x2"
-}

@@ -14,14 +14,13 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 **Packages (DNAnexus assets)**
 
 - `bedtools` (v2.30.0)
-- `htslib` (v1.15.0)
+- `htslib` (v1.22)
 - `mosdepth` (v0.3.3)
 - `pyTMB` (v1.6.0)
-- `samtools` (v1.19.2)
 
 **Inputs (required)**:
 
-- `vcf`: VEP-annotated VCF file (`.vcf`, `.vcf.gz`, `.bcf`, `.bcf.gz`).
+- `vcf`: VEP-annotated VCF file (`.vcf`, `.vcf.gz`, `.bcf`, `.bcf.gz`). Users should confirm that the VEP annotation field positions in the input VCF match those expected by the `vep.yaml` config, as a mismatch will cause pyTMB to misparse annotations without necessarily raising an error.
 - `bam`: BAM file used to compute the sample-specific, coverage-based effective genome size.
 - `bam_bai`: BAM index file (`.bam.bai` / `.bai`) required by `mosdepth` for coverage computation.
 - `bed`: Capture design BED file. Should be 0-based, sorted, and with no header.

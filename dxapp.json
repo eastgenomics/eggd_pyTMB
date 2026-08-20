@@ -3,7 +3,7 @@
   "title": "eggd_pyTMB",
   "summary": "Calculates Tumour Mutational Burden (TMB) from an annotated VCF using pyTMB",
   "dxapi": "1.0.0",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "inputSpec": [
     {
       "name": "bed",
@@ -137,33 +137,23 @@
     "assetDepends": [
       {
         "name": "bedtools",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/bedtools/bedtools_v2.30.0",
-        "version": "2.30.0"
+        "version": "2.30.0",
+        "id": "record-G1pJ7Y04v9z6FG9pGyYjFpy8"
       },
       {
-        "name": "htslib",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/htslib/htslib_v1.15.0",
-        "version": "1.15.0"
-      },
-      {
-        "name": "mosdepth",
-        "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
-        "folder": "/app_assets/mosdepth_v0.3.3",
-        "version": "0.3.3"
+        "name": "htslib_suite_asset",
+        "version": "1.22",
+        "id": "record-J1YBvy049yKpP7kk1j4ggqxZ"
       },
       {
         "name": "pytmb",
-        "project": "project-J87JkQQ46QQ71Pg858qKKJxY",
-        "folder": "/app_assets/pytmb_v1.6.0",
-        "version": "1.6.0"
+        "version": "1.6.0",
+        "id": "record-JB3QzQQ4YjP6qZFQ166Vyp1p"
       },
       {
-        "name": "samtools_asset",
-        "version": "2.0.0",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/samtools/samtools_v1.19.2/"
+        "name": "mosdepth",
+        "version": "0.3.3",
+        "id": "record-J9BZzJj41k0j0477G6QB4GPy"
       }
     ]
   },
