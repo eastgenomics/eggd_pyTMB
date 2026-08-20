@@ -17,7 +17,6 @@ This app may be executed as a standalone app to calculate TMB for a tumour sampl
 - `htslib` (v1.15.0)
 - `mosdepth` (v0.3.3)
 - `pyTMB` (v1.6.0)
-- `samtools` (v1.19.2)
 
 **Inputs (required)**:
 
