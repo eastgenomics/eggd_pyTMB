@@ -165,6 +165,10 @@ main() {
     TMB_REPORT="/home/dnanexus/out/tmb_report/${SAMPLE}_TMB.txt"
     assay_vcf_yaml="/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml"  # default to tnhaplotyper2 if not provided
 
+    # split VCF as CSQ is nested and pyTMB cannot handle nested CSQ fields. This is a temporary workaround until pyTMB is updated to handle nested CSQ fields.
+    export BCFTOOLS_PLUGINS=/usr/local/libexec/bcftools/
+    bcftools +split-vep "${vcf_path}" -c - -a CSQ -Oz -o split.vcf.gz
+
     # Single check: catches the no-match sentinel, any non-numeric value, AND zero
     if [[ ! "${EFF_GENOME_SIZE}" =~ ^[1-9][0-9]*$ ]]; then
         echo "Error: Effective genome size ('${EFF_GENOME_SIZE}') is not a valid positive integer." >&2
@@ -173,14 +177,14 @@ main() {
         echo "Effective genome size is ${EFF_GENOME_SIZE} bp"  
         # run pyTMB, capture output to the report file, and capture exit status separately
         if ! python3 -m pytmb.cli.run_tmb \
-            -i "${vcf_path}" \
+            -i split.vcf.gz \
             --varConfig "/home/dnanexus/pytmb/config/${vcf_yaml}_vcf.yml" \
             --dbConfig "/home/dnanexus/pytmb/config/vep.yml" \
             --effGenomeSize "${EFF_GENOME_SIZE}" \
             --vaf "${vaf}" --maf "${maf}" \
             --minDepth "${min_depth}" --minAltDepth "${min_alt_depth}" \
             --filterLowQual --filterNonCoding --filterSyn --filterSplice \
-            --filterPolym --polymDb 1k,gnomad \
+            --filterPolym --polymDb gnomad \
             > "${TMB_REPORT}" ; then
             exit_code=$?
             echo "FATAL: run_tmb failed with exit code ${exit_code}" >&2
