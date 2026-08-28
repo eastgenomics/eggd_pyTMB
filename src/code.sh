@@ -167,7 +167,10 @@ main() {
 
     # split VCF as CSQ is nested and pyTMB cannot handle nested CSQ fields. This is a temporary workaround until pyTMB is updated to handle nested CSQ fields.
     export BCFTOOLS_PLUGINS=/usr/local/libexec/bcftools/
-    bcftools +split-vep "${vcf_path}" -c - -a CSQ -Oz -o split.vcf.gz
+    # -a CSQ: specify the INFO field to split, which is CSQ in this case. This is the field that contains the VEP annotations.
+    # -c -: tells split-vep which CSQ subfields to pull out into their own INFO tags.
+    # -s worst: select the worst consequence for each variant, which is the most deleterious one. This is important for TMB calculation, as we want to count the most impactful variants.
+    bcftools +split-vep "${vcf_path}" -c - -a CSQ  -s worst -Oz -o split.vcf.gz
 
     # Single check: catches the no-match sentinel, any non-numeric value, AND zero
     if [[ ! "${EFF_GENOME_SIZE}" =~ ^[1-9][0-9]*$ ]]; then
